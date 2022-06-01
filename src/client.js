@@ -1,17 +1,43 @@
 const socket = new WebSocket('ws://localhost:12000');
-
 // Connection opened
+const user = ""
+const pass = ""
 socket.addEventListener('open', function (event) {
-    socket.send('Hello Server!');
+    console.log("connection successful")
+    socket.send(`USER ${user}`)
 });
 
+socket.addEventListener('message',(e) => {
+    const message = e.data
+
+    console.log(message)
+    if(message === "USER OK"){
+        socket.send(`PASS ${pass}`)
+        
+    }
+    else if(message === "OK"){
+        socket.send("LIST")
+        console.log('access granted')
+    }
+    else if (message.split(" ")[0] == "LIST"){
+        
+        const listing = JSON.parse(message.split(" ",2)[1])
+        console.log(listing)
+    }
+    
+})
+
+socket.addEventListener('close',() => {
+    console.log("connection failed")
+    
+})
 
 
-socket.addEventListener('message', function (event) {
 
-    console.log(event.data)
 
-});
+
+
+
 
 
 // const downloadFile = (blob,filename,ext) => {

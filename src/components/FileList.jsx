@@ -4,8 +4,10 @@ import File from "./File";
 import Plus from "./Plus";
 
 
-const arr = ['file1',"file2",'file3']
-export default function FileList(){
+
+export default function FileList({listing}){
+  const arr = listing ? listing : []
+  console.log(arr)
     return (
         <List>
           {arr.map((filename) => (

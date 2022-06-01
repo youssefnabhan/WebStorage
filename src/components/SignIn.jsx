@@ -12,7 +12,6 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -27,15 +26,55 @@ function Copyright(props) {
 }
 
 const theme = createTheme();
+//{listing, props.setListing ,socket, props.setSocket}
+export default function SignInSide(props) {
 
-export default function SignInSide() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+    // email: 
+    // password: data.get('password'),
+    const sock = new WebSocket('ws://localhost:12000');
+    // Connection opened
+    const user = data.get('email')
+    const pass = data.get('password')
+    sock.addEventListener('open', function (event) {
+      console.log("connection successful")
+      sock.send(`USER ${user}`)
     });
+
+    sock.addEventListener('message', (e) => {
+      const message = e.data
+
+      console.log(message)
+      if (message === "USER OK") {
+        sock.send(`PASS ${pass}`)
+
+      }
+      else if (message === "OK") {
+        sock.send("LIST")
+        console.log('access granted')
+      }
+      else if (message.split(" ")[0] === "LIST") {
+        //console.log(JSON.parse(message.slice(5)))
+        props.setListing(JSON.parse(message.slice(5)))
+        props.setSocket(sock)
+      }
+
+    })
+
+    sock.addEventListener('close', () => {
+      console.log("connection failed")
+      props.setSocket(null);
+
+    })
+    // const downloadFile = (blob,filename,ext) => {
+    //     var objectUrl = URL.createObjectURL(blob);
+    //     var link=document.createElement('a');
+    //     link.href=objectUrl
+    //     link.download=`${filename}.${ext}`;
+    //     link.click();
+    // }
   };
 
   return (
