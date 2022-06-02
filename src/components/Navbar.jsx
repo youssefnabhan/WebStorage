@@ -12,7 +12,7 @@ import FormGroup from '@mui/material/FormGroup';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 
-export default function MenuAppBar() {
+export default function MenuAppBar(props) {
   const [auth, setAuth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -24,9 +24,18 @@ export default function MenuAppBar() {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  const handleClose = (event) => {
+
+
+    console.log(event.target)
   };
+  const handleLogOut = () => {
+
+    localStorage.setItem('socket',"")
+    //localStorage.setItem('list',)
+    window.location.replace('http://localhost:3000/')
+    
+  }
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -71,8 +80,7 @@ export default function MenuAppBar() {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleClose}>My account</MenuItem>
-                <MenuItem onClick={handleClose}>log out</MenuItem>
+                <MenuItem onClick={handleLogOut}>log out</MenuItem>
               </Menu>
             </div>
           )}

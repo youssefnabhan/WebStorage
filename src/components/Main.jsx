@@ -5,9 +5,9 @@ import Plus from './Plus';
 export default function Main(props){
     return (
         <>
-      <Navbar/>
-      <FileList listing={props.listing}/>
-      <Plus/>
+          <Navbar setSocket={props.setSocket} file={props.file}/>
+          <FileList listing={props.listing} socket={props.socket}/>
+          <Plus file={props.file} setFile={props.setFile} socket={props.socket}/>
         </>
     )
 }

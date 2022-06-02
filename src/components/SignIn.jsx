@@ -27,26 +27,38 @@ function Copyright(props) {
 
 const theme = createTheme();
 //{listing, props.setListing ,socket, props.setSocket}
-export default function SignInSide(props) {
+export default function SignInSide({listing,setListing,socket,setSocket}) {
 
+  
+  const getListing = () => listing
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    // email: 
-    // password: data.get('password'),
-    const sock = new WebSocket('ws://localhost:12000');
-    // Connection opened
+     
     const user = data.get('email')
     const pass = data.get('password')
+    var fileb = false;
+    var filename = ""
+    const sock = new WebSocket('ws://localhost:12000');
     sock.addEventListener('open', function (event) {
       console.log("connection successful")
       sock.send(`USER ${user}`)
     });
-
     sock.addEventListener('message', (e) => {
       const message = e.data
 
       console.log(message)
+
+      if(fileb){
+        console.log('downloading')
+        var objectUrl = URL.createObjectURL(message);
+        var link=document.createElement('a');
+        link.href=objectUrl
+        link.download=`${filename}`;
+        link.click();
+        filename=""
+        fileb = false
+      }
       if (message === "USER OK") {
         sock.send(`PASS ${pass}`)
 
@@ -57,24 +69,54 @@ export default function SignInSide(props) {
       }
       else if (message.split(" ")[0] === "LIST") {
         //console.log(JSON.parse(message.slice(5)))
-        props.setListing(JSON.parse(message.slice(5)))
-        props.setSocket(sock)
+        const list = JSON.parse(message.slice(5))
+        localStorage.setItem('list',JSON.stringify(list))
+        setListing(list)
+        
+        //console.log("loaded list ", listing)
+        setSocket(sock)
+        localStorage.setItem('socket', sock)
       }
+
+      else if (message.split(" ")[0] === "DEL") {
+        const filename = message.split(" ")[1]
+        console.log(getListing())
+        const i = getListing().indexOf(filename)
+        console.log("old ", listing, i, filename)
+        const newList = getListing().splice(i , 1)
+        console.log("new ", newList)
+        setListing(newList)
+        localStorage.setItem('list', JSON.stringify(newList))
+      }
+
+      else if (message.split(" ")[0] === "file"){
+        filename = message.split(" ")[1] 
+        fileb =true;
+        sock.send("SEND")
+      }
+      else if(message.split(" ")[0] == "NEW"){
+        const newList = listing
+        const filename = message.split(" ")[1]
+        newList.push(filename)
+        setListing(newList)
+      }
+     
+      
+
 
     })
 
     sock.addEventListener('close', () => {
       console.log("connection failed")
-      props.setSocket(null);
+      setSocket(null);
+      localStorage.setItem('socket', null)
+      localStorage.setItem('list', null)
 
     })
     // const downloadFile = (blob,filename,ext) => {
-    //     var objectUrl = URL.createObjectURL(blob);
-    //     var link=document.createElement('a');
-    //     link.href=objectUrl
-    //     link.download=`${filename}.${ext}`;
-    //     link.click();
+    //     
     // }
+    
   };
 
   return (

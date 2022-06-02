@@ -5,13 +5,13 @@ import Plus from "./Plus";
 
 
 
-export default function FileList({listing}){
+export default function FileList({listing,socket}){
   const arr = listing ? listing : []
-  console.log(arr)
+  
     return (
         <List>
           {arr.map((filename) => (
-        <File name={filename}/>
+        <File name={filename} socket={socket}/>
       ))}
         </List>
     )
